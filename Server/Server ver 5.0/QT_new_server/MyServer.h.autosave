@@ -1,0 +1,78 @@
+#ifndef MYSERVER_H
+#define MYSERVER_H
+
+#include <MyThread.h>
+
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QThread>
+
+#include <QString>
+
+class MyServer : public QTcpServer {
+    Q_OBJECT
+
+public:
+    MyServer(QObject *parent = nullptr);
+
+protected:
+    void incomingConnection(qintptr socketDescriptor);
+
+private:
+    // Дополнительные члены класса, если необходимо
+};
+
+
+
+#endif // MYSERVER_H
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#include <QObject>
+#include <QTcpServer>
+#include <QTcpSocket>
+#include <QThread>
+
+class MultiThreadServer : public QTcpServer
+{
+    Q_OBJECT
+
+public:
+    explicit MultiThreadServer(QObject *parent = nullptr);
+    ~MultiThreadServer();
+
+protected:
+    void incomingConnection(qintptr socketDescriptor) override;
+
+private slots:
+    void onClientDisconnected();
+
+private:
+    QThread *thread;
+};
+
+class ClientHandler : public QObject
+{
+    Q_OBJECT
+
+public:
+    ClientHandler(qintptr socketDescriptor, QObject *parent = nullptr);
+    ~ClientHandler();
+
+public slots:
+    void process();
+
+private:
+    qintptr socketDescriptor;
+};

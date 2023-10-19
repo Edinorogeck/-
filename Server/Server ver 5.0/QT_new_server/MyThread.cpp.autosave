@@ -1,0 +1,39 @@
+#include <MyThread.h>
+
+
+MyThread::MyThread(int socketDescriptor) : socketDescriptor(socketDescriptor) {}
+
+void MyThread::run() {
+    QTcpSocket socket;
+    if (!socket.setSocketDescriptor(socketDescriptor)) {
+        emit error(socket.error());
+        return;
+    }
+
+    // Обработка данных от клиента
+    connect(&socket, &QIODevice::readyRead, this, &MyThread::readyRead);
+    connect(&socket, &QAbstractSocket::disconnected, this, &MyThread::disconnected);
+
+    qDebug() << "client connect: " << socketDescriptor;
+    exec();
+}
+
+void MyThread::readyRead() {
+    // Чтение данных от клиента и обработка
+    QTcpSocket *socket = static_cast<QTcpSocket*>(sender());
+    QByteArray data = socket->readAll();
+
+    // Ваша логика обработки данных
+
+    // Отправка ответа клиенту
+    socket->write("Server: Data received");
+
+    qDebug() << "print socketdescriptor" << socketDescriptor << data;
+}
+
+void MyThread::disconnected() {
+    // Обработка отключения клиента
+    QTcpSocket *socket = static_cast<QTcpSocket*>(sender());
+    //socket->deleteLater();
+    //quit();
+}

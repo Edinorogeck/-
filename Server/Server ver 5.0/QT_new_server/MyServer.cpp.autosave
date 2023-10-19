@@ -1,0 +1,21 @@
+#include <MyServer.h>
+
+
+
+MyServer::MyServer(QObject *parent) : QTcpServer(parent) {
+    if (this->listen(QHostAddress::Any, 2323)) {
+        qDebug() << "start";
+    }
+    else {
+        qDebug() << "error";
+    }
+
+}
+
+void MyServer::incomingConnection(qintptr socketDescriptor) {
+    MyThread *thread = new MyThread(socketDescriptor);
+    connect(thread, &MyThread::finished, thread, &MyThread::deleteLater);
+    thread->start();
+}
+
+
